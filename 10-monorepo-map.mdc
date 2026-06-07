@@ -1,0 +1,31 @@
+---
+description: Monorepo layout, subproject ownership, and where to make changes
+alwaysApply: true
+---
+
+# Monorepo Map
+
+Datagroom = collaborative dataset manager (Google-Sheets-over-MongoDB) + an LLM/RAG layer. Four subprojects:
+
+| Path | Role | Stack | Validation gate |
+|------|------|-------|-----------------|
+| `datagroom-gateway/` | Backend REST + WebSocket API, auth, RAG controller | Node 22+, Express 4, MongoDB driver v6, Socket.io v2, CommonJS | `npm test` (Jest) |
+| `datagroom-ui/` | **Legacy** frontend (still served in prod) | React 16, CRA 3.1.1, Redux, class components | `npm test` + `npm run build` |
+| `datagroom-ui-2026/` | **Current** frontend (active dev) | React 19, Vite 7, React Router 7, TanStack Query, ESM | `npm run build` |
+| `datagroom-mcp-server/` | Python MCP server for external dataset access via PAT | Python ≥3.10, MCP SDK, httpx, pydantic | `pytest` |
+
+Root design docs: `HYBRID_RAG_ARCHITECTURE.md`, `PAT_IMPLEMENTATION_AND_AUTH.md`, `project-specs.md`.
+
+## Critical facts
+
+- `datagroom-gateway/` and `datagroom-ui/` are **git submodules** (separate repos). Their canonical guidance is each repo's `AGENTS.md` — read it before editing, and respect that edits there are commits to a different repo.
+- New frontend work goes in **`datagroom-ui-2026`**, not the legacy `datagroom-ui`, unless the task explicitly targets legacy.
+- Subproject-specific standards live in rules `20`–`50`, scoped by glob — they auto-load when you open files in that subproject.
+- The submodule `AGENTS.md` files contain some **stale version numbers**; always trust `package.json` / `pyproject.toml` over prose. See `LESSONS.md`.
+
+## Decide-where checklist
+
+- API/route/DB/auth/RAG-server change → `datagroom-gateway/`.
+- Modern UI feature → `datagroom-ui-2026/`.
+- External LLM/Cursor access to datasets → `datagroom-mcp-server/`.
+- Touching multiple subprojects (e.g. a new end-to-end feature) → plan the contract first, change the gateway, then the UI.

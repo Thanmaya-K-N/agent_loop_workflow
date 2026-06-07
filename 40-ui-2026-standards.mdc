@@ -1,0 +1,26 @@
+---
+description: Coding standards for the current datagroom-ui-2026 (React 19 / Vite / React Router 7)
+globs: datagroom-ui-2026/**
+alwaysApply: false
+---
+
+# datagroom-ui-2026 Standards
+
+This is the **active** frontend. Default target for new UI work.
+
+- **ESM** (`"type": "module"`), **functional components + hooks only**. No class components.
+- **2-space indentation, single quotes** (match existing files — note this differs from the legacy UI's 4-space/double-quote style).
+- **API access goes through `app/api/`** (`client.js` exports `api()` plus typed helpers in `ds.js`, `uploads.js`). Never call `fetch` directly from a component.
+  - Base URL comes from `import.meta.env.VITE_API_BASE` (empty string = same-origin). Never hardcode hosts.
+  - All requests use `credentials: 'include'`; errors throw with `.status` and `.data` attached.
+- **Server state via TanStack Query** — add data hooks under `app/hooks/` (e.g. `useDsView`, `useEditCell`). Don't reinvent caching with ad-hoc `useEffect` fetches.
+- **Routing:** React Router 7 (`app/routes.js`, `app/root.jsx`). Auth gating via `app/auth/RequireAuth.jsx` + `AuthProvider.jsx`.
+- Real-time: Socket.io **client v2** (`useDatasetSocket`) — must stay compatible with the gateway's Socket.io v2.
+- Styling: CSS Modules (`*.module.css`) + Bootstrap 5 + `theme.css`. Colocate component styles.
+- Remove stray `console.log` debug lines you add before finishing.
+
+## Do NOT without human approval
+- Upgrade React, Vite, or React Router majors.
+- Change `AuthProvider`/PAT/auth flow (see `PAT_IMPLEMENTATION_AND_AUTH.md`).
+
+**Gate:** `npm run build` must succeed before done (no separate test runner is configured yet).

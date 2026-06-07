@@ -1,0 +1,28 @@
+---
+description: Maintain long-term memory by recording lessons after significant work
+alwaysApply: true
+---
+
+# Self-Improvement (Long-Term Memory)
+
+`LESSONS.md` (repo root) is the project's durable memory. **Read it at the start of a task** and **update it after any significant iteration.**
+
+## Append a lesson when you
+- Discover a non-obvious pitfall, gotcha, or footgun.
+- Find docs/comments/rules that are wrong or stale (record the correction).
+- Establish a reusable pattern, command, or fix.
+- Get bitten by something a future run should avoid.
+
+## Lesson format
+Append under the right section in `LESSONS.md` as a dated bullet:
+
+```
+- (YYYY-MM-DD) [subproject] Insight — what happened and the rule to follow next time.
+```
+
+## Discipline
+- Keep entries short, concrete, and actionable. One insight per bullet.
+- Don't duplicate an existing lesson — refine the existing one instead.
+- If a lesson contradicts a rule file (`.cursor/rules/*.mdc`) or an `AGENTS.md`, update that source too, then note it in `LESSONS.md`.
+- Never record secrets, tokens, credentials, or user data in `LESSONS.md`.
+- Prefer fixing the root cause (rule/doc) over only logging the symptom.

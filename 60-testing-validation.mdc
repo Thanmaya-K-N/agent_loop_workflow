@@ -1,0 +1,24 @@
+---
+description: Mandatory testing and validation gates before declaring any task complete
+alwaysApply: true
+---
+
+# Testing & Validation
+
+A task is **not done** until the gate for every touched subproject passes. Run gates from inside that subproject's folder.
+
+| Touched | Command(s) that MUST pass |
+|---------|---------------------------|
+| `datagroom-gateway/` | `npm test` (Jest + mongodb-memory-server). For focused work: `npm run test:db` / `test:mongofilters` / `test:api`. |
+| `datagroom-ui/` (legacy) | `npm test -- --watchAll=false` and `npm run build` |
+| `datagroom-ui-2026/` | `npm run build` (no test runner configured yet) |
+| `datagroom-mcp-server/` | `pytest` (inside the venv) |
+
+## Rules
+
+- **Run the real command** and read the output — do not assume success. Paste/observe failures and fix them.
+- **Add or update tests** for new behavior or bug fixes. Backend: prefer tests next to `datagroom-gateway/tests/`. Reproduce a bug with a failing test first, then fix.
+- **Fix lints you introduce** (use the editor diagnostics). Don't fix unrelated pre-existing lints unless asked.
+- First Jest run with `mongodb-memory-server` may be slow (downloads a Mongo binary) — that is expected, not a failure.
+- If a gate can't run in this environment, say so explicitly and state what was/wasn't verified — never claim it passed.
+- Manually exercise UI changes in the browser (login → list → edit) when feasible, since automated UI coverage is thin.

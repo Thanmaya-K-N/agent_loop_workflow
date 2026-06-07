@@ -1,0 +1,24 @@
+---
+description: Coding standards for the legacy datagroom-ui (React 16 / CRA / Redux)
+globs: datagroom-ui/**
+alwaysApply: false
+---
+
+# datagroom-ui (Legacy) Standards
+
+Authoritative reference: `datagroom-ui/AGENTS.md` (read it). Only edit here when the task explicitly targets legacy; otherwise prefer `datagroom-ui-2026`.
+
+- **React 16.13** — do NOT use React 17/18+ features (`createRoot`, automatic JSX transform, concurrent APIs).
+- Most components are **class-based** with `connect()` HOC. Match the surrounding file: class stays class, functional stays functional. Do not put hooks in class components.
+- **State flow:** actions (thunks) → services (`fetch`) → reducers. Add API calls in `src/common/services/`, export from `services/index.js`. Never `fetch` directly from a component.
+- Every `fetch` uses `credentials: "include"` + `authHeader()` + `config.apiUrl` prefix. Never hardcode `localhost`. API URL is set per-service file — update all three if changed.
+- JWT lives in `localStorage` under key `'user'` (existing pattern; don't add new storage).
+- Style: 4-space indent, double quotes in JSX. Global CSS — check for class-name collisions.
+- Forked git deps (`react-tabulator`, `markdown-it-*`) must not be swapped for registry versions without testing.
+
+## Do NOT without human approval
+- Upgrade React / react-scripts / Redux / Socket.io / React Router majors.
+- `npm run eject`.
+- Extensively rework `DsView.js` (~2300 lines, most complex component) or the auth flow.
+
+**Gate:** `npm test` and `npm run build` must pass before done.

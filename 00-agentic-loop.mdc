@@ -1,0 +1,23 @@
+---
+description: Core agentic loop every task must follow (plan -> generate -> validate -> critique -> iterate -> learn)
+alwaysApply: true
+---
+
+# Agentic Loop
+
+Every non-trivial task MUST run this loop. Do not skip steps.
+
+1. **Plan** — Restate the goal. For multi-step work, write a short plan (TodoWrite for 3+ steps). Identify which subproject(s) are affected (see `10-monorepo-map`).
+2. **Locate context** — Read the relevant `AGENTS.md` / per-subproject rule before editing. Read existing code; match its patterns.
+3. **Generate** — Make the smallest change that advances the plan. One concern per edit. Prefer editing existing files over creating new ones.
+4. **Validate** — Run the validation gate for the affected subproject (`60-testing-validation`). Fix lints you introduce.
+5. **Critique** — Re-read your diff as a hostile reviewer (the user's code is reviewed by a second AI). Check: correctness, edge cases, security, did I break an existing pattern, did I add stale/duplicate logic?
+6. **Iterate** — If validation or critique fails, loop back to step 3. Do not declare success on unverified work.
+7. **Learn** — After any significant change or surprise, append a lesson (`70-self-improvement`).
+
+## Rules of engagement
+
+- **Small, verifiable steps.** Never batch many unrelated changes into one giant edit.
+- **Evidence over assumption.** Quote file/line evidence; don't guess versions or APIs — check `package.json` / `pyproject.toml`.
+- **Human-in-the-loop only for major/destructive changes** (dependency major bumps, auth/CORS/DB-abstraction changes, schema migrations, deletions, anything in "WHEN IN DOUBT" of an AGENTS.md). For everything else, decide and proceed.
+- **Never leave the repo broken.** If you can't finish, leave it in a compiling/test-passing state and say what's left.

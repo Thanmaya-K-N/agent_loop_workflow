@@ -1,0 +1,24 @@
+---
+description: Security and secrets handling across all Datagroom subprojects
+alwaysApply: true
+---
+
+# Security & Secrets
+
+Applies to every subproject.
+
+## Secrets
+- **Never** hardcode, log, or print API keys, passwords, JWTs, PAT tokens (`dgpat_...`), or DB connection strings.
+- Read secrets from env: `process.env.X` (Node) / `config.py` + env (Python). Add new vars to the relevant `.env.example` with a comment.
+- **Never** commit `.env`, `ssl/` certs, `uploads/`, `attachments/`, or any user data. They are gitignored — keep it that way.
+
+## Access control (do not weaken)
+- Backend: ACL (`AclCheck.aclCheck`) then per-row (`PerRowAccessCheck`) before any dataset op. The MCP server relies on the gateway enforcing these — never add a bypass.
+- Auth flows: JWT cookies (gateway/legacy UI), PAT Bearer tokens (MCP). Changes to auth, CORS, or cookie settings require human review.
+
+## Data handling
+- Don't echo raw dataset rows into logs or commit messages.
+- Treat the `data/`, `uploads/`, and `attachments/` directories as user data — read only when the task requires it; never commit their contents.
+
+## When unsure
+If a change could expose a secret, broaden access, or alter authn/authz, **stop and ask for human review** before proceeding.

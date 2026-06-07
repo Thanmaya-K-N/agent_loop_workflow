@@ -1,0 +1,39 @@
+---
+description: Coding standards for the datagroom-gateway Node/Express backend
+globs: datagroom-gateway/**
+alwaysApply: false
+---
+
+# datagroom-gateway Standards
+
+Authoritative reference: `datagroom-gateway/AGENTS.md` (read it). Highlights:
+
+- **CommonJS only** — `require` / `module.exports`. No `import`/`export`.
+- **All async uses `async/await`**; wrap route handlers in `try/catch` and log with the Pino `logger` from `logger.js`. Never `console.log`.
+- **DB access only through the `DbAbstraction` singleton.** Never `new MongoClient`. One MongoDB *database* per dataset (collections: `data`, `metaData`, `editlog`, `attachments`).
+- **Route order is mandatory:** ACL check (`AclCheck.aclCheck`) → per-row check (`PerRowAccessCheck.enforcePerRowAccessCtrl`) → business logic → log edit → respond. Never weaken or skip access checks.
+- HTTP status convention: 200 ok, 400 bad request, 401 unauthorized, 403 ACL denied, 404 not found, 415 server error/exception.
+- Style: 4-space indent, single quotes, camelCase vars/files, PascalCase classes. Match the file you edit.
+- New env vars → add to `.env.example` with a comment and read via `process.env`.
+
+Example handler:
+
+```javascript
+router.post('/view/editSingleAttribute', async (req, res, next) => {
+    try {
+        await AclCheck.aclCheck(req, dsName);
+        // per-row check, then dbAbstraction op, then editlog
+        res.status(200).json(result);
+    } catch (e) {
+        logger.error(e, 'Exception in /view/editSingleAttribute');
+        res.status(415).send(e);
+    }
+});
+```
+
+## Do NOT without human approval
+- Upgrade major versions of `mongodb`, `socket.io`, or `express`.
+- Change auth (JWT/LDAP), CORS, cookie settings, or `DbAbstraction`.
+- Lower the 200 MB body-parser limit.
+
+**Gate:** run `npm test` from `datagroom-gateway/` before declaring done.

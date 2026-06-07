@@ -1,0 +1,23 @@
+---
+description: Coding standards for the datagroom-mcp-server (Python MCP server)
+globs: datagroom-mcp-server/**
+alwaysApply: false
+---
+
+# datagroom-mcp-server Standards
+
+Python MCP server giving external LLMs (Cursor) read access to Datagroom datasets via a PAT. Reference: `datagroom-mcp-server/README.md` and root `PAT_IMPLEMENTATION_AND_AUTH.md`.
+
+- **Python ≥3.10**, packaged with hatchling; entry point `datagroom_mcp.server:main`.
+- Source lives in `src/datagroom_mcp/` (`server.py`, `gateway_client.py`, `config.py`, `formatters.py`).
+- **Async I/O with `httpx.AsyncClient`** — match the existing async style; don't introduce blocking `requests`.
+- **Use `pydantic` models** for tool inputs/outputs and config validation (existing dependency).
+- Talk to the backend only through `gateway_client.py`; don't scatter raw HTTP calls. It authenticates with `Authorization: Bearer <PAT>`.
+- **Config/secrets:** read the PAT and gateway URL from env (`DATAGROOM_PAT_TOKEN`, etc.) via `config.py`. Never hardcode or log tokens. Keep `.env.example` in sync when adding settings.
+- Respect that the server is **read-oriented** and the gateway still enforces all ACLs — do not try to bypass them.
+- Type-hint new functions; keep tool docstrings accurate (they become the MCP tool descriptions the LLM sees).
+
+## Dependencies
+- Add runtime deps to `pyproject.toml` `[project.dependencies]`, dev/test deps to the `dev` optional group. Pin a sane lower bound.
+
+**Gate:** activate the venv and run `pytest` before declaring done. If no test covers the change, add a focused one.
